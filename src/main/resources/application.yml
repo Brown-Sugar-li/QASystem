@@ -1,0 +1,201 @@
+#配置开发环境
+spring:
+  profiles:
+    active: Development
+
+---
+#--------------------------------------Development Environment--------------------------------------------
+#设置端口号和访问路径
+server:
+  port: 8000
+  servlet:
+    context-path: /
+#引入druid数据源
+spring:
+  profiles: Development
+  devtools:
+    add-properties: false
+  datasource:
+    #设置数据源类型
+    type: com.alibaba.druid.pool.DruidDataSource
+    #设置数据库驱动程序
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    #设置数据库的访问地址 139.196.79.161  localhost
+    url: jdbc:mysql://139.196.79.161:3306/qasystem?serverTimezone=GMT%2B8&useUnicode=true&nullCatalogMeansCurrent=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true
+    #设置用户名和密码
+    username: root
+    password: 123456
+  #main:
+  # allow-bean-definition-overriding: true #当遇到同样名字的时候，是否允许覆盖注册
+  #邮箱配置
+  mail:
+    host: smtp.qq.com
+    username: 1195424838@qq.com
+    password: xhgolzlnkepbgahi   #POP3/SMTP服务
+    #password: cdynjneyyszpfdje    #IMAP/SMTP服务
+    default-encoding: UTF-8
+    port: 587
+    properties:
+      mail:
+      smtp:
+      auth: true
+      socketFactory:
+      class: javax.net.ssl.SSLSocketFactory
+
+  #thymeleaf
+  thymeleaf:
+    cache: false
+    prefix:  classpath:/templates/
+    check-template-location: true
+    suffix: .html
+    encoding: utf-8
+    mode: HTML
+  #这个是关键，放开springboot对静态资源的拦截
+  mvc:
+    static-path-pattern: /static/**
+
+  redis:
+    database: 3  # redis数据库索引(默认为0)，我们使用索引为3的数据库，避免和其他数据库冲突
+    host: 47.117.42.108  # redis服务器地址（默认为loaclhost）
+    port: 6379  # redis端口（默认为6379）
+    password: brownsugar  # redis访问密码（默认为空）
+    timeout: 0  # redis连接超时时间（单位毫秒）
+    pool:  # redis连接池配置
+      max-active: 8  # 最大可用连接数（默认为8，负数表示无限）
+      max-idle: 8  # 最大空闲连接数（默认为8，负数表示无限）
+      min-idle: 0  # 最小空闲连接数（默认为0，该值只有为正数才有用）
+      max-wait: -1  # 从连接池中获取连接最大等待时间（默认为-1，单位为毫秒，负数表示无限）
+
+
+#整合mybatis-plus框架
+mybatis-plus:
+  #配置别名包（将映射文件内的resultType路径公共部分放在别名包内，进行拼接 ）
+  type-aliases-package: com.brownsuagr.qasystem.entity
+  #加载映射文件的路径
+  mapper-locations: classpath*:/Mappers/*.xml
+
+  #开启驼峰命名规则
+  #1、根据sql语句获取结果集对象
+  #2、在内存中使用驼峰命名规则将user_id中的下划线去掉
+  #3、将下划线去点下一字母大写，就可以匹配数据库中的自动映射的值
+  configuration:
+    map-underscore-to-camel-case: true
+
+#在application.yml引入log4j2.yml
+logging:
+  config: classpath:log4j2.yml
+
+
+
+
+#配置本地磁盘路径：
+#轻量级的分布式文件管理系统FastDFS
+#反向代理：将用户发来的请求进行反向代理，并返回真实的资源请求
+#Tomcat并发能力不如nginx的原因：
+# 1、首先nginx是基于C语言开发，Tomcat是基于Java
+# 2、nginx只是完成拦截请求和发起请求，不存在任何中间环节，tomcat还要做很多操作（增删改查）
+# 3、nginx开启会存在两个进程，一个主进程和一个守护进程
+# 4、nginx的常见命令符
+#       1）、开启nginx：start nginx
+#       2）、停止nginx：nginx -s stop
+#       3）、重启nginx：nginx -s reload
+# 5、加密机制：非对称加密方式（公钥和私钥），数据摘要信息（校验信息的完整性和安全性，对数据进行Hash）
+# 6、Https和Http安全机制不同，认证机制每个https都需要进行备案
+#教我怎样将活动安排的井井有条
+
+
+---
+#--------------------------------------Test Environment--------------------------------------------
+#设置端口号和访问路径
+server:
+  port: 80
+  servlet:
+    context-path: /
+#引入druid数据源
+spring:
+  profiles: test
+  devtools:
+    add-properties: false
+  datasource:
+    #设置数据源类型
+    type: com.alibaba.druid.pool.DruidDataSource
+    #设置数据库驱动程序
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    #设置数据库的访问地址10.1.66.148  localhost
+    url: jdbc:mysql://localhost:3306/qasystem?serverTimezone=GMT%2B8&useUnicode=true&nullCatalogMeansCurrent=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true&useSSL=false
+    #设置用户名和密码
+    username: root
+    password: 123456
+  #main:
+  # allow-bean-definition-overriding: true #当遇到同样名字的时候，是否允许覆盖注册
+  #邮箱配置
+  mail:
+    host: smtp.qq.com
+    username: 1195424838@qq.com
+    password: xhgolzlnkepbgahi   #POP3/SMTP服务
+    #password: cdynjneyyszpfdje    #IMAP/SMTP服务
+    default-encoding: UTF-8
+    port: 587
+    properties:
+      mail:
+      smtp:
+      auth: true
+      socketFactory:
+      class: javax.net.ssl.SSLSocketFactory
+
+  #thymeleaf
+  thymeleaf:
+    cache: false
+    prefix:  classpath:/templates/
+    check-template-location: true
+    suffix: .html
+    encoding: utf-8
+    mode: HTML
+  #这个是关键，放开springboot对静态资源的拦截
+  mvc:
+    static-path-pattern: /static/**
+
+  redis:
+    database: 3  # redis数据库索引(默认为0)，我们使用索引为3的数据库，避免和其他数据库冲突
+    host: 47.117.42.108  # redis服务器地址（默认为loaclhost）
+    port: 6379  # redis端口（默认为6379）
+    password: brownsugar  # redis访问密码（默认为空）
+    timeout: 0  # redis连接超时时间（单位毫秒）
+    pool:  # redis连接池配置
+      max-active: 8  # 最大可用连接数（默认为8，负数表示无限）
+      max-idle: 8  # 最大空闲连接数（默认为8，负数表示无限）
+      min-idle: 0  # 最小空闲连接数（默认为0，该值只有为正数才有用）
+      max-wait: -1  # 从连接池中获取连接最大等待时间（默认为-1，单位为毫秒，负数表示无限）
+
+#整合mybatis-plus框架
+mybatis-plus:
+  #配置别名包（将映射文件内的resultType路径公共部分放在别名包内，进行拼接 ）
+  type-aliases-package: com.brownsuagr.qasystem.entity
+  #加载映射文件的路径
+  mapper-locations: classpath*:/Mappers/*.xml
+
+  #开启驼峰命名规则
+  #1、根据sql语句获取结果集对象
+  #2、在内存中使用驼峰命名规则将user_id中的下划线去掉
+  #3、将下划线去点下一字母大写，就可以匹配数据库中的自动映射的值
+  configuration:
+    map-underscore-to-camel-case: true
+
+#在application.yml引入log4j2.yml
+logging:
+  config: classpath:log4j2.yml
+
+#配置本地磁盘路径：
+#轻量级的分布式文件管理系统FastDFS
+#反向代理：将用户发来的请求进行反向代理，并返回真实的资源请求
+#Tomcat并发能力不如nginx的原因：
+# 1、首先nginx是基于C语言开发，Tomcat是基于Java
+# 2、nginx只是完成拦截请求和发起请求，不存在任何中间环节，tomcat还要做很多操作（增删改查）
+# 3、nginx开启会存在两个进程，一个主进程和一个守护进程
+# 4、nginx的常见命令符
+#       1）、开启nginx：start nginx
+#       2）、停止nginx：nginx -s stop
+#       3）、重启nginx：nginx -s reload
+# 5、加密机制：非对称加密方式（公钥和私钥），数据摘要信息（校验信息的完整性和安全性，对数据进行Hash）
+# 6、Https和Http安全机制不同，认证机制每个https都需要进行备案
+#教我怎样将活动安排的井井有条

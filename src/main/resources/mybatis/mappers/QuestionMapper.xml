@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.brownsuagr.qasystem.mapper.QuestionMapper">
+
+
+    <select id="findQuestionByPage" resultMap="QuestionModelVO">
+        select *
+        <include refid="queryWhereId"/>
+        order by createdTime desc
+        limit
+
+    </select>
+
+    <!--定义封装的返回值类型-->
+    <resultMap type="com.brownsuagr.qasystem.vo.QuestionModelVO"
+               id="QuestionModelVO">
+        <!-- 关联映射  many2one,one2one -->
+        <association property="model"
+                     column="modelId"
+                     select="com.libnet.mappper.ModelMapper.findById">
+        </association>
+    </resultMap>
+    <!--	定义内部嵌入式sql请求-->
+    <sql id="queryWhereId">
+        from literature
+        <where>
+            <if test="search != null and search !=''">
+                concat(lit_title,lit_type,lit_author,lit_keyword,lit_dept) like concat('%',#{search},'%')
+            </if>
+        </where>
+    </sql>
+
+</mapper>

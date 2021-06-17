@@ -1,0 +1,144 @@
+  <header class="navbar navbar-static-top bs-docs-nav" id="top" style="background-color: #333;">
+  <div class="container" >
+    <div class="navbar-header" >
+      <a href="/index" class="navbar-brand" style="color: #f6f6f6;">IT&nbsp;Quiz&nbsp;Robot</a>
+    </div>
+  </div>
+</header>
+<main class="container">
+  <div class="row row-offcanvas row-offcanvas-right projects">
+    <div >
+      <div class="page-header " >
+        <div style="color: #333;" id="model-name" class="h2">问题提交</div>
+      </div>
+      <form>
+        <div class="form-group padding-horizontal" style="padding-left: 15px;padding-right: 15px;">
+          <label for="question">问题描述</label>
+          <input class="form-control" id="question"  spellcheck="true" >
+        </div>
+        <div class="form-row" >
+          <div class="form-group col-md-6">
+            <label for="keyword">关键词（使用分号分割）</label>
+            <input type="text" class="form-control" id="keyword">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="modelId">分类</label>
+            <select id="modelId" class="form-control">
+              <option selected="selected" disabled="disabled" style='display: none;color: #327ab7'value=''>请选择模块...</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row" >
+          <div class="form-group col-md-6">
+            <label for="submitter">提交人</label>
+            <input  class="form-control" id="submitter">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="email">邮箱（方便沟通）</label>
+            <input type="email" class="form-control" id="email">
+          </div>
+        </div>
+        <div class="form-group padding-horizontal" style="padding-left: 15px;padding-right: 15px;">
+          <label for="answer">问题答案</label>
+          <textarea  class="form-control" id="answer" rows="8" placeholder="请简短的输入问题答案..." spellcheck="false"></textarea>
+        </div>
+          <button type="button" class="btn btn-primary" style="margin-left: 15px;background-color: #327ab7;" id="submit">提交</button>
+      </form>
+    </div>
+  </div>
+
+</main>
+<footer class="bs-docs-footer navbar-fixed-bottom" style="background-color: #2d2a2a">
+  <div class="container">
+    <ul class="bs-docs-footer-links">
+      <li><a href="https://github.com/twbs/bootstrap">GitHub 主页</a></li>
+      <li><a href="/">个人博客</a></li>
+      <li><a href="https://v3.bootcss.com">前端设计来自于BootStrap</a></li>
+    </ul>
+    <!--        <p class="version">&copy; 2021-4-15 Company FutureFactory, ·BrownSuagr.</p>-->
+    <p class="version" style="color:#f3f3f3;margin-top: 5px">当前版本： v1.0.0 &nbsp;&nbsp;|&nbsp;&nbsp;最近一次资源更新于：2021-04-12</p>
+  </div>
+</footer>
+  <link href="../../static/css/docs.css" rel="stylesheet"/>
+<style>
+  /*footer选择器*/
+  body { padding-bottom: 200px; }
+  .btn-clipboard {border-radius: 0.5rem;color: #327ab7;background-color: #fff;}
+  .btn-clipboard:hover, .btn-clipboard:focus {color: #f9f9f9;background-color: #327ab7;}
+</style>
+<script>
+  $(document).ready(function(){
+    loadModeList();
+    //提交问题
+    $("#submit").click(function (){
+      const reg = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/;
+      var params = getFormData();
+      if(!params.question.trim()){
+        alert('alert','warning','提示信息','问题不能为空！',100);
+        return;
+      }
+      if(!params.keyword.trim()){
+        alert('alert','warning','提示信息','关键词不能为空！',100);
+        return;
+      }
+      if(!params.modeId.trim()){
+        alert('alert','warning','提示信息','问题类型不能为空！',100);
+        return;
+      }
+      if(!params.createdUser.trim()){
+        alert('alert','warning','提示信息','提交人不能为空！',100);
+        return;
+      }
+      if (!reg.test(params.email.trim())) {
+        alert('alert','warning','提示信息','请填写正确邮箱！',100);
+        return;
+      }
+      if(!params.answer.trim()){
+        alert('alert','warning','提示信息','问题答案不能为空！',100);
+        return;
+      }
+      var url = "question/doSaveQuestion";
+      console.log(params);
+      $.post(url,params,function(result){
+        if(result.state==1){
+          alert('alert','info','提示信息','提交成功！等待审核...',100);
+        }else{
+          alert('alert','info','提示信息',result.message,100);
+        }
+      })
+    });
+  });
+  //加载下拉菜单模块
+  function loadModeList(){
+    $.ajax({
+      async: true,
+      type: "POST",
+      url: "model/getModelList",
+      dataType: "json",
+      success: function (result) {
+        if(result.state == 1){
+          for (var i = 0; i < (result.data).length; i++) {
+            var modelData = result.data[i];
+            $("#modelId").append('<option value="'+modelData.id+'">'+modelData.name+'</option>');
+          }
+        }else{
+          console.log("模块不存在！");
+        }
+      }
+    });
+  }
+  //获取表单数值
+  function getFormData(){
+    //var params=
+            return {
+      question:$("#question").val(),
+      keyword:$("#keyword").val(),
+      modeId:$("#modelId").val(),
+      createdUser:$("#submitter").val(),
+      email:$("#email").val(),
+      answer:$("#answer").val()
+    }
+    //return params;
+  }
+</script>
+

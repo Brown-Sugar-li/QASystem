@@ -1,0 +1,239 @@
+<link href="../../static/css/docs.css" rel="stylesheet"/>
+<header class="navbar navbar-static-top bs-docs-nav" id="top" style="background-color: #333;">
+    <div class="container" >
+        <div class="navbar-header" >
+            <a href="/index" class="navbar-brand" style="color: #f6f6f6;">IT&nbsp;Quiz&nbsp;Robot</a>
+        </div>
+    </div>
+</header>
+<main class="container">
+    <div class="row row-offcanvas row-offcanvas-right projects">
+        <div class="col-xs-12 col-sm-9">
+            <div class="page-header " >
+                <div style="color: #333;" id="model-name" class="h2">Java基础 </div>
+            </div>
+
+            <ul class="pager" style="margin-top:5px" id="flipOver">
+                <li class="previous"><a onclick="getQuestionPre()"><span aria-hidden="true">&larr;</span>&nbsp;上一题</a></li>
+                <li class="next" ><a onclick="getQuestionNext()">下一题&nbsp;<span aria-hidden="true">&rarr;</span></a></li>
+            </ul>
+            <div id="questionCardBody">
+<!--                <div class="bd-clipboard"><button type="button" class="btn-clipboard">Random</button></div>-->
+<!--                <div class="jumbotron single-member effect-4" style="color: #ffffff;background-color:#337ab7" >-->
+<!--                    <div class="member-info">-->
+<!--                        <h2 style="margin-top:5px" >面向对象的特征有哪些方面？</h2>-->
+<!--                    </div>-->
+<!--                    <div class="more-info" style="margin-top:10px">-->
+<!--                        <p  style="font-size: 18px;text-indent:2em;letter-spacing:1px;">-->
+<!--                            抽象：抽象是将一类对象的共同特征总结出来构造类的过程，包括数据抽-->
+<!--                            象和行为抽象两方面。抽象只关注对象有哪些属性和行为，并不关注这些行为的-->
+<!--                            细节是什么。  继承：继承是从已有类得到继承信息创建新类的过程。提供继承信息的类-->
+<!--                            被称为父类（超类、基类）；-->
+<!--                            变化中的软件系统有了一定的延续性，同时继承也是封装程序中可变因素的重要-->
+<!--                            手段（如果不能理解请阅读阎宏博士的《Java 与模式》或《设计模式精解》中-->
+<!--                            关于桥梁模式的部分）。-->
+<!--                        </p>-->
+<!--                    </div>-->
+<!--                </div>-->
+            </div>
+            <div class="mb-3">
+                <label for="project-overview" class="form-label">&nbsp;答题卡（鼠标移动置蓝色区域查看答案）</label>
+                <textarea style="margin-top: 15px" class="form-control" id="project-overview" rows="6" placeholder="请简短的输入问题答案..." spellcheck="false"></textarea>
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" style="margin-top: 50px;color:#337ab7">
+        </div>
+    </div>
+</main>
+<footer class="bs-docs-footer navbar-fixed-bottom" style="background-color: #2d2a2a">
+<!--<footer class="footer" style="background-color: #2d2a2a">-->
+    <div class="container">
+        <ul class="bs-docs-footer-links">
+            <li><a href="https://github.com/twbs/bootstrap">GitHub 主页</a></li>
+            <li><a href="/">个人博客</a></li>
+            <li><a href="https://v3.bootcss.com">前端设计来自于BootStrap</a></li>
+        </ul>
+<!--        <p class="version">&copy; 2021-4-15 Company FutureFactory, ·BrownSuagr.</p>-->
+        <p class="version" style="color:#f3f3f3;margin-top: 5px">当前版本： v1.0.0 &nbsp;&nbsp;|&nbsp;&nbsp;最近一次资源更新于：2021-04-12</p>
+    </div>
+</footer>
+<style>
+    /*hover选择器*/
+    .single-member{  background-color: #fff; position: relative;}
+    .member-image img{max-width: 100%; min-width:100%;vertical-align: middle;}
+    .effect-4{ overflow: hidden;}
+    .effect-4 .member-image img{width: 100%;}
+    .effect-4 .more-info{height: 0; transition: 0.4s; overflow: hidden; z-index: 9; position: relative; }
+    .effect-4:hover .more-info {height:auto; transition: 0.4s;}
+    /*footer选择器*/
+    body { padding-bottom: 200px; }
+    /*模式提示选择器*/
+    .btn-clipboard {border-radius: 0.5rem;color: #fff;background-color: #327ab7;}
+    .btn-clipboard:hover, .btn-clipboard:focus {color: #fff;background-color: #327ab7;}
+</style>
+<script>
+    $(document).ready(function(){
+        loadModeSumList();
+        loadSingleQuestion();
+    });
+
+    //定义累加上下篇切换下标
+    var index = 0;
+    //随机载入单条问题
+    function loadSingleQuestion(){
+        index = 0;
+        var randomQuestion = $("#indexBody").data("randomQuestion");
+        //console.log("转存对象"+randomQuestion.toString());
+        //console.log("打印第一个对象"+randomQuestion[0]);
+        var flag = $("#indexBody").data("flag");
+        //随机开始
+        if(flag == 0){
+            //alert("随机开始：（0：随机 1：模块）"+flag);
+            setCardBody(randomQuestion[0],flag);
+            return;
+        }
+        //模块开始
+        fromModelLoad(randomQuestion[this.index],1);
+        if(randomQuestion.length == 1 ){
+            $(".next").hide();
+            $(".previous").hide();
+            //alert('alert','warning','模块资源','该分类只包含一个资源哦！',100);
+            return;
+        }
+        if(index == 0){
+            $(".previous").hide();
+            return;
+        }
+    }
+    //下一篇
+    function getQuestionNext(){
+        //随机模式
+        if($("#indexBody").data("flag") == 0){
+            fromModelLoad(0,0);
+            return;
+        }
+        var randomQuestion = $("#indexBody").data("randomQuestion");
+        //alert("数组长度："+randomQuestion.length);
+        this.index++;
+        fromModelLoad(randomQuestion[this.index],1);
+        $(".previous").show();
+        if(this.index == randomQuestion.length-1 ){
+            //隐藏下一篇按钮
+            $(".next").hide();
+            //alert("下一篇-->index:"+this.index);
+            //alert("已经没有下一篇啦！");
+            return;
+        }
+    }
+    //上一篇
+    function getQuestionPre(){
+        //模块模式
+        if($("#indexBody").data("flag") == 0){
+            fromModelLoad(0,0);
+            return;
+        }
+        var randomQuestion = $("#indexBody").data("randomQuestion");
+        this.index--;
+        fromModelLoad(randomQuestion[this.index],1);
+        $(".next").show();
+        if(this.index <= 0){
+            //隐藏下一篇按钮
+            $(".previous").hide();
+            //提示已经没有啦
+            //alert("已经没有上一篇啦！");
+            return;
+        }
+    }
+    //载入一条问题
+    function fromModelLoad(questionId,flag){
+        const url = "question/getOneQuestion";
+        //flag （0：随机 1：模块）modelId （0 OR ModelId）
+        let params = {questionId: questionId,flag:flag};
+        $.post(url,params,function(result){
+            if(result.state == 1){
+                //获取的问题追加到页面
+                //console.log("模式（0：随机 1：模块）："+flag+"，问题ID"+ questionId+"，数据结果："+result.data[0])
+                setCardBody(result.data[0],flag);
+            }else{
+                alert('alert','warning','资源载入',result.message,100);
+            }
+        })
+    }
+    //设置问题卡片主体
+    function setCardBody(records,flag) {
+        $("#model-name").html(records.name);
+        //清除元素内容
+        // $("#questionBody").empty();
+        // const body = $("#questionBody");
+        $("#questionCardBody").empty();
+        const body = $("#questionCardBody");
+        const innerBody = setQuestionCard(records,flag);
+        body.append(innerBody);
+    }
+    //加载卡片信息
+    function setQuestionCard(data,flag){
+        var m = flag == 0 ? "Random" : "Model";
+        var tds= "<div class='bd-clipboard'><button type='button' class='btn-clipboard'>"+ m +"</button></div>"+
+                 "<div class='jumbotron single-member effect-4' style='color: #ffffff;background-color:#337ab7'>"+
+                 "<div class='member-info'><h3 style='margin-top:5px'>"+ data.question +"</h3></div>"+
+                 "<div class='more-info' style='margin-top:10px'><p style='font-size: 18px;text-indent:2em;letter-spacing:1px;'>"+ data.answer +"</p></div>"+
+                 "</div>";
+        return tds;
+    }
+    //加载侧边栏模块
+    function loadModeSumList(){
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "model/getModelSumList",
+            dataType: "json",
+            success: function (result) {
+                if(result.state == 1){
+                    setSideBar(result.data);
+                }else{
+                    console.log("模块不存在！");
+                }
+            }
+        });
+    }
+    //设置侧边栏主体
+    function setSideBar(records) {
+        const sidebar = $("#sidebar");
+        const listGroup = $("<div class='list-group'></div>");
+        const listItemTop = $("<a class='list-group-item active' style='background-color: #337ab7;border-color: #337ab7'>模块列表</a>");
+        listGroup.append(listItemTop);
+        for (let i = 0; i < records.length; i++) {
+            const listItem = setListItem(records[i]);
+            listGroup.append(listItem);
+        }
+        sidebar.append(listGroup);
+    }
+    //设置侧边栏信息
+    function setListItem(data) {
+        const cols = "<a class='list-group-item' onclick='btnOnclick(" + "\"" + data.id + "\"" + ");' > " + data.category + " <span class = 'badge badge-primary badge-pill' >" + data.sum + "</span> </a>";
+        return cols;
+    }
+    //设置侧边栏内嵌click事件
+    function  btnOnclick(id) {
+        const url = "question/getQuestionArray";
+        const params = {modelId: id};
+        //发起请求
+        $.post(url,params,function(result){
+            if(result.state == 1){
+                //移除绑定内容
+                $("#indexBody").removeData("flag");
+                $("#indexBody").removeData("randomQuestion");
+                //模块对应数组绑定
+                $("#indexBody").data("randomQuestion",result.data);
+                $("#indexBody").data("flag",1);
+                $(".next").show();
+                $(".previous").show();
+                loadSingleQuestion();
+            }else{
+                alert('alert','warning','资源载入',result.message,100);
+            }
+        })
+    }
+
+</script>
+

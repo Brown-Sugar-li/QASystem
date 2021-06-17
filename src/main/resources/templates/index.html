@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-redeviation-bs-uid="29073">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <link rel="icon" href="../static/img/favicon.ico" />
+    <title>IT&nbsp;Quiz&nbsp;Robot</title>
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="../static/js/jquery.min.js"></script>
+<!--    <script src="../static/js/jquery-1.7.2.min.js"></script>-->
+    <script src="../static/js/bootstrap.min.js"></script>
+    <link href="../static/css/docs.min.css" rel="stylesheet"/>
+    <script src="../static/js/docs.min.js"></script>
+    <script src="../static/js/modal_dialog.js"></script>
+    <script src="../static/js/track.js"></script>
+</head>
+<body class="bs-docs-home" data-new-gr-c-s-check-loaded="14.1005.0" id="indexBody" >
+    <header class="navbar navbar-static-top bs-docs-nav" id="top">
+        <div class="container">
+            <div class="navbar-header">
+                <a href="/index" class="navbar-brand">&nbsp;IT&nbsp;Quiz&nbsp;Robot</a>
+            </div>
+        </div>
+    </header>
+    <main class="bs-docs-masthead" id="content" tabindex="-1" style="background-image: linear-gradient(to bottom,#2d2a2a 0,#2d2a2a 100%)">
+        <div class="container">
+            <p class="lead">欢迎使用&nbsp;IT&nbsp;Quiz&nbsp;Robot，这是一款自主问答机器人！</p>
+            <p class="lead">
+                <a id="beginRandom" class="btn btn-outline-inverse btn-lg" style="border-color: #00ffe7" >随机开始</a>
+                <a id="submitQuestion" class="btn btn-outline-inverse btn-lg" style="border-color: #00ffe7" >提交问题</a>
+            </p>
+        </div>
+    </main>
+    <div class="container projects">
+        <div class="projects-header page-header"></div>
+        <div class="row" id="mainContentId">
+<!--            <div class="col-sm-6 col-md-4 col-lg-3 ">-->
+<!--                <div class="thumbnail" style="height: 200px;">-->
+<!--                    <div class="caption">-->
+<!--                        <h3><a href="https://www.youzhan.org/" target="_blank" onclick="">优站精选</a> <hr/></h3>-->
+<!--                        <p>Bootstrap 优站精选频道收集了众多基于 Bootstrap 构建、设计精美的、有创意的网站。</p>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+        </div>
+    </div>
+    <footer class="bs-docs-footer " style="background-color: #2d2a2a">
+        <div class="container" >
+            <ul class="bs-docs-footer-links">
+                <li><a href="https://github.com/twbs/bootstrap">GitHub 主页</a></li>
+                <li><a href="/">个人博客</a></li>
+                <li><a href="https://v3.bootcss.com">前端设计来自于BootStrap</a></li>
+            </ul>
+            <p class="version" style="color:#f3f3f3;margin-top: 5px">当前版本：V1.0.0&nbsp;&nbsp;| &nbsp;&nbsp;最近一次资源更新于：2021-04-12</p>
+        </div>
+    </footer>
+    <script>
+        $(document).ready(function(){
+            //载入模块列表
+            loadModeList();
+            //随机开始
+             $("#beginRandom").click(function (){
+                 $.ajax({
+                     //timeout: 3000,
+                     async: false,
+                     type: "POST",
+                     url: "question/random",
+                     dataType: "json",
+                     success: function (result) {
+                         if(result.state == 1){
+                             //载入随机问题页面（0：随机 1：模块）
+                             doLoadUI("/question",0);
+                             //移除绑定内容
+                             $("#indexBody").removeData("randomQuestion");
+                             //重新数据绑定在
+                             $("#indexBody").data("randomQuestion",result.data);
+
+                         }else{
+                             console.log("随机问题不存在");
+                         }
+                     }
+                 });
+             });
+            //问题提交
+            $("#submitQuestion").click(function (){
+                doLoadUI("/question/submit","问题提交");
+            });
+            //获取访问日志
+            getLog();
+        });
+        //获取访问日志
+        function  getLog() {
+            //请求地址
+            const url = "log/getLog";
+            //触发main方法
+            const log = jt_main("http://localhost/index");
+            console.log("日志："+log);
+            const param = {log: log};
+            //发起请求
+            $.post(url,param,function(result){
+                if(result.state == 1){
+                    console.log(result.message);
+                }else{
+                    console.log(result.message);
+                }
+            })
+        }
+
+        //button事件载入页面
+        function doLoadUI(url,title) {
+            $("#indexBody").removeData("flag");
+            $("#indexBody").data("flag",title);
+            $("#indexBody").load(url);
+        }
+        //载入模块信息
+        function loadModeList(){
+            $.ajax({
+                //timeout: 3000,
+                async: false,
+                type: "POST",
+                url: "model/getModelList",
+                dataType: "json",
+                success: function (result) {
+                    if(result.state == 1){
+                        //下方模块列表
+                        doSetRows(result.data);
+                    }else{
+                        console.log("数据走丢了");
+                    }
+                }
+            });
+        }
+        //设置模块行列数据
+        function doSetRows(records) {
+            const rowBody = $("#mainContentId");
+            for (let i = 0; i < records.length; i++) {
+                const currentRow = $("<div class='col-sm-6 col-md-4 col-lg-3'></div>");
+                //定义行数据
+                const row = $("<div class='thumbnail' style='height: 200px;'></div>");
+                const rows = $("<div class='caption'></div>");
+                //定义列数据
+                const col = doCreateRow(records[i]);
+                //将行数据添加到页面中
+                rows.append(col);
+                row.append(rows);
+                currentRow.append(row);
+                rowBody.append(currentRow);
+            }
+        }
+        //追加模块内容
+        function doCreateRow(data) {
+            const col = "<h3><a target='_blank' onclick='btnOnclick(" + data.id + "," + "\"" + data.name + "\"" + ");' >" + data.name + "</a><hr/></h3>" +
+                "<p class='text-justify' >" + cutString(data.description, 120) + "</p>";
+            return col;
+        }
+        //从模块进去问题
+        function  btnOnclick(modelId,title) {
+            //请求地址
+            const url = "question/getQuestionArray";
+            const params = {modelId: modelId,name: title};
+            //发起请求
+            $.post(url,params,function(result){
+                if(result.state == 1){
+                    //载入随机问题页面
+                    //$("#indexBody").load("/question");
+                    doLoadUI("/question",1);
+                    //移除绑定内容
+                    //$("#indexBody").removeData("flag");
+                    $("#indexBody").removeData("randomQuestion");
+                    $("#indexBody").data("randomQuestion",result.data);
+                    //$("#indexBody").data("flag",1);
+                    //模块对应数组绑定
+                }else{
+                    alert('alert','warning','资源载入',result.message,100);
+                }
+            })
+        }
+         //根据长度截取先使用字符串，超长部分追加…
+        function cutString(str, len) {
+            //length属性读出来的汉字长度为1
+            if(str.length*2 <= len) {
+                return str;
+            }
+            var strlen = 0;
+            var s = "";
+            for(var i = 0;i < str.length; i++) {
+                s = s + str.charAt(i);
+                if (str.charCodeAt(i) > 128) {
+                    strlen = strlen + 2;
+                    if(strlen >= len){
+                        return s.substring(0,s.length-1) + "...";
+                    }
+                } else {
+                    strlen = strlen + 1;
+                    if(strlen >= len){
+                        return s.substring(0,s.length-2) + "...";
+                    }
+                }
+            }
+            return s;
+        }
+        //提示信息
+        function alert(type,icon,title,content,top){
+            $modal({
+                type: type, //弹框类型  'alert' or  'confirm' or 'message'   message提示(开启之前如果之前含有弹框则清除)
+                icon: icon, // 提示图标显示 'info' or 'success' or 'warning' or 'error'  or 'question'
+                timeout: 2000, // 单位 ms  显示多少毫秒后关闭弹框 （ confirm 下无效 | 不传默认为 2000ms | 最短显示时间为500ms）
+                title: title, // 提示文字
+                content: content, // 提示文字
+                top: top, //距离顶部距离 单位px
+                center: false,// 是否绝对居中 默认为false  设置true后   top无效
+                transition: 300, //过渡动画 默认 200   单位ms
+                closable: true, // 是否显示可关闭按钮  默认为 false
+                mask:true, // 是否显示遮罩层   默认为 false
+                pageScroll: true, // 是否禁止页面滚动
+                width:500, // 单位 px 默认显示宽度 最下默认为300
+                maskClose:true, // 是否点击遮罩层可以关闭提示框 默认为false
+            })
+        }
+    </script>
+</body>
+</html>
